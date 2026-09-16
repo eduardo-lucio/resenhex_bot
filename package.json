@@ -1,0 +1,23 @@
+{
+  "name": "bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+      "dev": "tsx watch src/bot.ts",
+      "start": "node dist/bot.js",
+      "build": "tsup src/config.ts --minify"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.13",
+    "typescript": "^6.0.3"
+  },
+  "private": true,
+  "author": "harukkik",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.4.2"
+  }
+}
