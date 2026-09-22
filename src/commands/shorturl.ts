@@ -1,4 +1,4 @@
-import {ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder} from "discord.js";
+import {ChatInputCommandInteraction, SlashCommandBuilder} from "discord.js";
 import z from "zod"
 export const data = new SlashCommandBuilder()
     .setName("shorturl")
@@ -24,27 +24,50 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction: ChatInputCommandInteraction) {
     const urlSchema = z.string().url("Deve ser uma url")
     const apiUrl = "https://urlshortenerel.vercel.app/urls"
+    const customApiUrl = "https://urlshortenerel.vercel.app/urls/custom"
     try{
         const url = urlSchema.parse(interaction.options.getString("url"))
-        const request = new Request(apiUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                url,
-                validTime: interaction.options.getNumber("dias")
+        if(!interaction.options.getString("customname")){
+            const request = new Request(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    url,
+                    validTime: interaction.options.getNumber("dias")
+                })
             })
-        })
-        const response = await fetch(request)
-        const responseJson = await response.json()
-        console.log(url)
-        console.log(interaction.options.getNumber("dias"))
-        console.log(responseJson)
-        return interaction.reply("<"+`https://urlshortenerel.vercel.app/u/${responseJson.shortUrl}`+">")
-    }catch(err) {
-        return interaction.reply(err.message)
+            const response = await fetch(request)
+            const responseJson = await response.json()
+            if(responseJson.message){
+                return interaction.reply(responseJson.message)
+            }
+            return interaction.reply("<"+`https://urlshortenerel.vercel.app/u/${responseJson.shortUrl}`+">")
+        }else{
+            const request = new Request(customApiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    url,
+                    customName: interaction.options.getString("customname"),
+                    validTime: interaction.options.getNumber("dias")
+                })
+            })
+            const response = await fetch(request)
+            const responseJson = await response.json()
+            console.log(responseJson)
+            if(responseJson.message){
+                if(responseJson.details){
+                    return interaction.reply(responseJson.details[0].message)
+                }
+                return interaction.reply(responseJson.message)
+            }
+            return interaction.reply("<"+`https://urlshortenerel.vercel.app/u/${responseJson.shortUrl}`+">")
+        }
+    }catch(e) {
+        return interaction.reply("oi")
     }
-
-    return interaction.reply("`online-fix.me`");
 }
