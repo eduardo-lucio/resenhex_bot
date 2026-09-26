@@ -1,4 +1,3 @@
-
 import { REST, Routes } from "discord.js";
 import { config } from "./config";
 import { commands } from "./commands";

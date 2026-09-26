@@ -26,4 +26,13 @@ client.on("interactionCreate", async (interaction) => {
         await commands[commandName as keyof typeof commands].execute(interaction);
     }
 });
-client.login(process.env.DISCORD_TOKEN);
+async function bootstrap() {
+    try {
+        await client.login(process.env.DISCORD_TOKEN);
+    } catch (error) {
+        console.error("Falha de DNS/Rede ao conectar no Discord. Encerrando para reinício...", error);
+        process.exit(1);
+    }
+}
+
+bootstrap();
